@@ -10,8 +10,9 @@ import { downloadSubtitles } from './download-subtitles/download-subtitles.funct
 import { downloadVideos } from './download-videos.function';
 
 export async function downloadCourse(appRoot: string): Promise<void> {
+  const authHeaders = await authService.getAuthHeaders();
   const courseUrl = await promptCourseUrl();
-  const coursePage = await apiService.get(courseUrl).then(parseAxiosResponseToDoc);
+  const coursePage = await apiService.get(courseUrl, undefined, authHeaders).then(parseAxiosResponseToDoc);
   const videosList = await loadVideosList(courseUrl, coursePage);
 
   messageService.out({
@@ -38,7 +39,6 @@ export async function downloadCourse(appRoot: string): Promise<void> {
   /** TODO: figure out how to get necessary info with a single request instead
    *  of the current two requests
    */
-  const authHeaders = await authService.getAuthHeaders();
   const authCoursePage = await apiService.get(courseUrl, undefined, authHeaders).then(parseAxiosResponseToDoc);
 
   await downloadExercises(authCoursePage, downloadFolderPath);
